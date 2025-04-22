@@ -85,5 +85,11 @@ async function getMethodDeleteByToken(url) {
 }
 
 
+function urlGlobal(){
+    return 'http://localhost:8080';
+}
 
-export {getMethod,getMethodByToken, uploadSingleFile,uploadMultipleFile,getMethodPostByToken,getMethodDeleteByToken,getMethodPostPayload}
+
+
+
+export {getMethod,getMethodByToken, uploadSingleFile,uploadMultipleFile,getMethodPostByToken,getMethodDeleteByToken,getMethodPostPayload, urlGlobal}

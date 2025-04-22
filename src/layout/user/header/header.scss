@@ -1145,3 +1145,104 @@ max-height:100%;
 #thatbai{
     display: none;
 }
+
+.chat-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.chat-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.chat-box {
+    display: none;
+    width: 300px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    border: 1px solid #ccc;
+}
+
+.chat-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.chat-body {
+    padding: 10px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.chat-footer {
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.chat-footer button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#listchat {
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+}
+#listchat p {
+    color: #fff !important;
+}
+.mychat{
+    background-color: #0084ff;
+    color: #fff;
+    max-width: 70%;
+    padding: 3px 7px;
+    border-radius: 10px;
+    display: inline-block;
+    align-self: flex-end;
+}
+.adminchat{
+    background-color: #f0f0f0;
+    max-width: 70%;
+    padding: 3px 7px;
+    border-radius: 10px;
+    display: inline-block;
+    align-self: flex-start;
+}

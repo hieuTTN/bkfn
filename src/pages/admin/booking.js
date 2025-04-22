@@ -9,6 +9,7 @@ import { getMethodByToken ,getMethodPostByToken,getMethodDeleteByToken,getMethod
 import Swal from 'sweetalert2';
 import { formatMoney } from '../../services/money';
 import AsyncSelect from 'react-select/async';
+import { usePDF } from 'react-to-pdf';
 
 var token = localStorage.getItem("token");
 
@@ -21,10 +22,16 @@ const AdminBooking = ()=>{
     const [itemBookingService, setItemBookingService] = useState([]);
     const [itemBookingId, setItemBookingId] = useState(null);
     const [itemServiceDaChon, setItemServiceDaChon] = useState([]);
+    const [invoice, setInvoice] = useState(null);
+    const [bookingRoom, setBookingRoom] = useState([]);
+    const [bookingService, setBookingService] = useState([]);
+    const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});
+
     useEffect(()=>{
         const getBooking= async() =>{
             var response = await getMethodPostByToken('http://localhost:8080/api/booking/admin/all-room');
             var list = await response.json();
+            console.log(list);
             setItems(list)
         };
         getBooking();
@@ -64,6 +71,12 @@ const AdminBooking = ()=>{
         var response = await getMethodPostByToken('http://localhost:8080/api/booking/admin/all-room?from='+from+'&to='+to);
         var list = await response.json();
         setItems(list)
+    }
+
+    function setBookingRs(item){
+        setInvoice(item);
+        setBookingRoom(item.bookingRooms);
+        setBookingService(item.bookingServices);
     }
 
     async function updateStatus() {
@@ -215,12 +228,14 @@ const AdminBooking = ()=>{
                                     <td>{item.fullname}</td>
                                     <td>{item.phone}</td>
                                     <td>{loadTrangThai(item.payStatus)}</td>
-                                    <td>{formatMoney(item.amountRoom + item.amountService)}</td>
+                                    <td>{formatMoney(item.amountRoom * item.numDate + item.amountService)}</td>
                                     <td class="sticky-col">
                                         <i onClick={()=>getBookingRoomAndService(item.id)} data-bs-toggle="modal" data-bs-target="#modaldeail" class="fa fa-eye iconaction"></i>
                                         <i onClick={()=>setItembooking(item)} data-bs-toggle="modal" data-bs-target="#capnhattrangthai" class="fa fa-edit iconaction"></i><br/>
                                         <br/><i onClick={()=>deleteBooking(item.id, item.payStatus)} class="fa fa-trash iconaction"></i>
                                         <i onClick={()=>setItemBookingId(item.id)} data-bs-toggle="modal" data-bs-target="#addService" class="fa fa-plus iconaction"></i><br/>
+
+                                        {item.payStatus != 'PAID'?'':<><br/><i onClick={()=>setBookingRs(item)} data-bs-toggle="modal" data-bs-target="#modalprint" className='fa fa-print iconaction'></i></>}
                                     </td>
                                 </tr>
                                 }))}
@@ -344,6 +359,98 @@ const AdminBooking = ()=>{
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalprint" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">In hóa đơn</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" ref={targetRef}>
+        <h5 className='titleprint'>Hóa đơn đặt phòng khách sạn</h5>
+        <hr></hr>
+        <div className='inforkhdiv'>
+            <div className='headerinfor'>
+                Thông tin khách hàng
+            </div>
+            <div className='contentinfor'>
+                <table className='table table-border-less'>
+                    <tr>
+                        <td>Họ tên</td>
+                        <td>{invoice == null?'':invoice.fullname}</td>
+                    </tr>
+                    <tr>
+                        <td>Số điện thoại</td>
+                        <td>{invoice == null?'':invoice.phone}</td>
+                    </tr>
+                    <tr>
+                        <td>Checkin</td>
+                        <td>{invoice == null?'':invoice.fromDate}</td>
+                    </tr>
+                    <tr>
+                        <td>Checkout</td>
+                        <td>{invoice == null?'':invoice.toDate}</td>
+                    </tr>
+                    <tr>
+                        <td>Số ngày ở</td>
+                        <td>{invoice == null?'':invoice.numDate}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div className='inforkhdiv'>
+            <div className='headerinfor'>
+                Thông tin chi tiết
+            </div>
+            <div className='contentinfor'>
+                <table className='table table-border-less'>
+                    {bookingRoom.map((item=>{
+                        return  <tr>
+                        <td>Tên: {item.room.name}</td>
+                        <td>Loại: {item.room.category.name}</td>
+                        <td>Giá: {formatMoney(item.price)}</td>
+                    </tr>
+                    }))}
+                    {bookingService.map((item=>{
+                        return  <tr>
+                        <td>Tên: {item.services.name}</td>
+                        <td>Loại: {item.services.category.name}</td>
+                        <td>Giá: {formatMoney(item.price)}</td>
+                    </tr>
+                    }))}
+                </table>
+            </div>
+        </div>
+        <div className='inforkhdiv'>
+            <div className='headerinfor'>
+                Tổng tiền thanh toán
+            </div>
+            <div className='contentinfor'>
+            <table className='table table-border-less'>
+                <tr>
+                    <td>Tổng tiền</td>
+                    <td>{invoice == null?'':formatMoney(invoice.numDate * invoice.amountRoom + invoice.amountService)}</td>
+                </tr>
+                <tr>
+                    <td>Tiền cọc</td>
+                    <td>{invoice == null?'':formatMoney((invoice.numDate * invoice.amountRoom) - (invoice.numDate * invoice.amountRoom * 70 /100))} - <span className='dacoc'>30%</span></td>
+                </tr>
+                <tr>
+                    <td>Tiền phải thanh toán</td>
+                    <td>{invoice == null?'':formatMoney((invoice.numDate * invoice.amountRoom) - (invoice.numDate * invoice.amountRoom * 30 /100) + invoice.amountService)}</td>
+                </tr>
+            </table>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button onClick={() => toPDF()} class="btn btn-primary">Tạo</button>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
     );
 }

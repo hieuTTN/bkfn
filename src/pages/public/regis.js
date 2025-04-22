@@ -11,6 +11,7 @@ async function handleRegis(event) {
         fullname: event.target.elements.fullname.value,
         email: event.target.elements.email.value,
         phone: event.target.elements.phone.value,
+        type: event.target.elements.loaikhachhang.value,
         password: event.target.elements.password.value
     };
     const res = await fetch('http://localhost:8080/api/regis', {
@@ -56,6 +57,10 @@ function regis(){
                         <input name="phone" placeholder="Số điện thoại" class="inputform"/>
                         <input name="email" placeholder="Địa chỉ email" class="inputform" type="email" required/>
                         <input name="password" placeholder="Mật khẩu" class="inputform" type="password" required/>
+                        <select name='loaikhachhang' className='inputform'>
+                            <option>Khách nội địa</option>
+                            <option>Khách quốc tế</option>
+                        </select>
                         <button class="btndn">Đăng Ký</button>
                         <p class="nothvaccount"><span>Bạn đã có tài khoản? </span><a href="login" class="aquenmk">Đăng nhập ngay</a></p>
                     </form>

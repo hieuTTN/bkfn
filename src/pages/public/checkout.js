@@ -33,6 +33,7 @@ async function requestPayMentMomo() {
 
     var paymentDto = {
         "content": "thanh toán đặt cọc phòng",
+        "soNgay": cart.songay,
         "returnUrl": returnurl,
         "listRoomId": cart.listroom,
     }
@@ -58,6 +59,11 @@ async function requestPayMentMomo() {
 function PublicCheckout(){
     const [items, setItems] = useState([]);
     const [cart, setCart] = useState(null);
+    const [point, setPoint] = useState(0);
+    const [totalAm, setTotalAm] = useState(0);
+    const [tienCoc, setTienCoc] = useState(0);
+    const [tamTinh, setTamTinh] = useState(0);
+
     useEffect(()=>{
         loadRoomCheckout();
         loadInitBooking();
@@ -86,10 +92,10 @@ async function loadRoomCheckout() {
     setItems(list)
     var totalAmount = 0;
     for (var i = 0; i < list.length; i++) {
-        totalAmount = Number(totalAmount) + Number(list[i].price)
+        totalAmount = Number(totalAmount) + Number(list[i].price) * cart.songay
     }
-    document.getElementById("totalAmount").innerHTML = formatMoney(totalAmount)
-    document.getElementById("tiencoc").innerHTML = formatMoney(totalAmount*30/100)
+    setTotalAm(totalAmount)
+    setTienCoc(totalAmount*30/100)
 }
 
 async function loadInitBooking(){
@@ -104,6 +110,10 @@ async function loadInitBooking(){
     document.getElementById("fullname").value = user.fullname
     document.getElementById("phone").value = user.phone
     document.getElementById("tichdiem").innerHTML = user.point + ' điểm (Tích đủ 100 điểm, bạn sẽ được giảm giá 5%)'
+    if(user.point != null){
+        setPoint(user.point);
+        setTamTinh(totalAm * 5 % 100)
+    }
 }
 
     return(
@@ -159,12 +169,12 @@ async function loadInitBooking(){
                     <div class="magg">
                         <table class="table">
                             <tr>
-                                <td>Tạm tính</td>
-                                <td class="colright" id="totalAmount">359.000đ</td>
+                                <th>Tạm tính</th>
+                                <td class="colright" id="totalAmount">{formatMoney(totalAm)} {point < 100 ? '' : ', giảm giá: 5%: '+ formatMoney(totalAm * 5 / 100)+', tiền giảm giá sẽ được trả lại sau khi trả phòng' }</td>
                             </tr>
                             <tr>
-                                <td>Tiền cọc</td>
-                                <td class="colright" id="tiencoc">0đ</td>
+                                <th>Tiền cọc</th>
+                                <td class="colright" id="tiencoc">{formatMoney(tienCoc)}</td>
                             </tr>
                             <tr>
                                 <th>Tích điểm</th>

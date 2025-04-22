@@ -36,6 +36,7 @@ var listRoomArr = [];
 function PublicBookingRoom(){
     const [items, setItems] = useState([]);
     const [itemCategory, setCategory] = useState([]);
+    const [room, setRoom] = useState(null);
     useEffect(()=>{
         khoiTao();
         const getCategory = async() =>{
@@ -183,15 +184,15 @@ function PublicBookingRoom(){
                         {items.map((item=>{
                             return <div class="row singleroom">
                             <div class="col-4">
-                                <img src={item.image} data-bs-toggle="modal" data-bs-target="#modaldeail" class="imgroom pointer"/>
+                                <img onClick={()=>setRoom(item)} src={item.image} data-bs-toggle="modal" data-bs-target="#modaldeail" class="imgroom pointer"/>
                             </div>
                             <div class="col-8">
                                 <div class="nameroomdiv">
                                     <span class="roomnames pointer">{item.name}</span>
-                                    <span data-bs-toggle="modal" data-bs-target="#modaldeail" class="motaroom pointer">Xem mô tả & ảnh phòng</span>
+                                    <span onClick={()=>setRoom(item)}  data-bs-toggle="modal" data-bs-target="#modaldeail" class="motaroom pointer">Xem mô tả & ảnh phòng</span>
                                 </div>
                                 <div class="d-flex numbedroom">
-                                    <span><i class="fa fa-bed"></i> Số giường: {item.namenumBed}</span>
+                                    <span><i class="fa fa-bed"></i> Số giường: {item.numBed}</span>
                                     <span><i class="fa fa-users"></i> Số người tối đa: {item.maxPeople}</span>
                                 </div>
                                 <div class="row">
@@ -236,6 +237,23 @@ function PublicBookingRoom(){
                 </div>
             </div>
         </section>
+
+        <div class="modal fade" id="modaldeail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Thông tin phòng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div dangerouslySetInnerHTML={{__html:room==null?'':room.description}}></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+            </div>
     </div>
     );
 }

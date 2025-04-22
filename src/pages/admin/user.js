@@ -100,6 +100,7 @@ const AdminUser = ()=>{
                                     <th>Họ tên</th>
                                     <th>Số điện thoại</th>
                                     <th>Ngày tạo</th>
+                                    <th>Loại khách hàng</th>
                                     <th>Quyền</th>
                                     <th>Khóa</th>
                                 </tr>
@@ -118,6 +119,7 @@ const AdminUser = ()=>{
                                         <td>{item.fullname}</td>
                                         <td>{item.phone}</td>
                                         <td>{item.createdDate}</td>
+                                        <td>{item.type}</td>
                                         <td>{item.authorities.name}</td>
                                         <td class="sticky-col">
                                             {btn}

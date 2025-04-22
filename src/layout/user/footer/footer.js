@@ -1,7 +1,119 @@
 import StyleFooter from '../header/header.scss'
 import logofooter from '../../../assest/images/footer.png'
+import { useState, useEffect } from 'react'
+import { Parser } from "html-to-react";
+import {getMethodByToken, postMethodPayload, getMethodPostByToken, urlGlobal} from '../../../services/request';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
-function footer(){
+
+function Footer(){
+  const [client, setClient] = useState(null);
+  const [itemChat, setItemChat] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    var token = window.localStorage.getItem("token");
+    if(token == null){
+      return;
+    }
+    const getUser = async() =>{
+        var response = await getMethodPostByToken("http://localhost:8080/api/user/user-logged")
+        var result = await response.json();
+        console.log(result);
+        
+        setUser(result)
+    };
+    getUser();
+    const getMess= async() =>{
+        var response = await getMethodByToken('http://localhost:8080/api/chat/user/my-chat');
+        var result = await response.json();
+        setItemChat(result)
+    };
+    getMess();
+
+    var userlc = localStorage.getItem("user")
+    var email = JSON.parse(userlc).email
+    var url = urlGlobal();
+    const sock = new SockJS(url+'/hello');
+    const stompClient = new Client({
+    webSocketFactory: () => sock,
+    onConnect: () => {
+        console.log("WebSocket connected successfully!");
+        stompClient.subscribe('/users/queue/messages', (msg) => {
+            var Idsender = msg.headers.sender
+            appendRecivers(msg.body, Idsender)
+        });
+    },
+    connectHeaders: {
+        username: email  // Truyền email vào header khi kết nối
+    }
+    });
+    stompClient.activate();
+    setClient(stompClient);
+
+    return () => {
+        stompClient.deactivate();
+    };
+  }, []);
+
+
+  function clickSendMess(){
+    client.publish({
+      destination: '/app/hello/-10',
+      body: document.getElementById("contentmess").value,
+    });
+    append()
+  }
+
+  function enterSendMess(e){
+      var key = e.which;
+      if(key == 13)  // the enter key code
+      {
+        client.publish({
+          destination: '/app/hello/-10',
+          body: document.getElementById("contentmess").value,
+        });
+        append()
+      }
+  }
+
+  function append() {
+      var tinhan = document.createElement('p');
+      tinhan.className = "mychat";
+      tinhan.textContent = document.getElementById("contentmess").value; 
+      document.getElementById('listchat').appendChild(tinhan);
+      var scroll_to_bottom = document.getElementById('listchat');
+      scroll_to_bottom.scrollTop = scroll_to_bottom.scrollHeight;
+      document.getElementById("contentmess").value = ''
+  }
+
+  function appendRecivers (message) {
+      var cont = document.createElement('p');
+      cont.className = "adminchat";
+      cont.textContent = message;
+      document.getElementById('listchat').appendChild(cont);
+      var scroll_to_bottom = document.getElementById('scroll-to-bottom');
+      scroll_to_bottom.scrollTop = scroll_to_bottom.scrollHeight;
+  }
+
+  
+function toggleChat() {
+  var chatBox = document.getElementById("chat-box");
+  var btnopenchat = document.getElementById("btnopenchat");
+  if (chatBox.style.display === "none" || chatBox.style.display === "") {
+      chatBox.style.display = "block";
+      chatBox.style.bottom = "20px";
+      btnopenchat.style.display = 'none'
+  }
+  else {
+      chatBox.style.display = "none";
+      btnopenchat.style.display = ''
+  }
+}
+
+
+
     return(
         <div id='footer'>
           <footer class="text-center text-lg-start text-muted">
@@ -46,8 +158,35 @@ function footer(){
       </div>
     </section>
 </footer>
+
+          <div class="chat-container" id="btnchatbottom">
+              <button class="chat-button" id="btnopenchat" onClick={toggleChat}><i class="fa fa-comment"></i> Chat với chúng tôi</button>
+
+              <div id="chat-box" class="chat-box">
+                  <div class="chat-header">
+                      <h3>Xin chào bạn!</h3>
+                      <button class="close-btn" onClick={toggleChat}>X</button>
+                  </div>
+                  <div class="chat-body" id="scroll-to-bottom">
+                      <div id="listchat">
+                        {itemChat.map((item, index)=>{
+                          if(item.sender.id == user.id){
+                            return <p class="mychat">{item.content}</p>
+                          }
+                          else{
+                            return <p class="adminchat">{item.content}</p>
+                          }
+                        })}
+                      </div>
+                  </div>
+                  <div class="chat-footer">
+                      <input onKeyUp={(e)=>enterSendMess(e)} type="text" id="contentmess" placeholder="Nhập tin nhắn..." />
+                      <button onClick={()=>clickSendMess()} id="sendmess">Gửi</button>
+                  </div>
+              </div>
+          </div>  
         </div>
     );
 }
 
-export default footer;
+export default Footer;

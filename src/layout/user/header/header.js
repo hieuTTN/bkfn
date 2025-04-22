@@ -46,7 +46,7 @@ function header (){
                         <a href="tel:1900%201833" class="phonemenu"><i class="fa fa-phone"></i> 1900 1833</a>
                     </div>
                     <div class="d-flex">
-                        <a href="" class="linkidmenu"><i class="fab fa-facebook icmenu pointer"></i></a>
+                        <a target='_blank' href="https://www.facebook.com/profile.php?id=100010580581303" class="linkidmenu"><i class="fab fa-facebook icmenu pointer"></i></a>
                         <a href="" class="linkidmenu"><i class="fab fa-youtube icmenu pointer"></i></a>
                         <a href="" class="linkidmenu"><i class="fab fa-instagram pointer"></i></a>
                     </div>

@@ -1,15 +1,4 @@
-import Header from '../../layout/user/header/header'
-import Footer from '../../layout/user/footer/footer'
-import banner from '../../assest/images/banner.jpg'
-import indeximg from '../../assest/images/index1.jpg'
-import momo from '../../assest/images/momo.webp'
-import {getMethod} from '../../services/request'
-import {formatMoney} from '../../services/money'
 import { useState, useEffect } from 'react'
-import { Parser } from "html-to-react";
-import avatar from '../../assest/images/avatar.jpg'
-import { json } from 'react-router-dom'
-import {toast } from 'react-toastify';
 import $ from 'jquery'; 
 
 var size = 6
@@ -57,13 +46,16 @@ async function createBooking() {
 
 $( document ).ready(function() {
     // createBooking();
+    var uls = new URL(document.URL)
+    var orderId = uls.searchParams.get("orderId");
+    var requestId = uls.searchParams.get("requestId");
+    if(orderId != null && requestId != null){
+        createBooking();
+    }
 });
 
 function PublicPayment(){
 
-    useEffect(()=>{
-        createBooking();
-    }, []);
   
     return(
         <div class="contentmain"><br/><br/><br/>
